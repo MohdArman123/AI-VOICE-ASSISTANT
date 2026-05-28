@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <meta name="theme-color" content="#14161E" />
+    <meta name="description" content="Premium AI voice chat UI with real-time waveform visualization and streaming audio" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <title>AI Voice Chat - Premium Assistant UI</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+    
+    <!-- Prevents iOS from zooming on input focus -->
+    <script>
+      if (/iPhone|iPad|iPod/.test(navigator.userAgent)) {
+        document.addEventListener('touchend', function() {
+          document.activeElement?.blur();
+        });
+      }
+    </script>
+  </body>
+</html>
