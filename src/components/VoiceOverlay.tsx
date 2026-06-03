@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { OrbButton } from './OrbButton';
 import { Transcript } from './Transcript';
 import { SuggestionChips } from './SuggestionChips';
+import { AmbientWave } from './AmbientWave';
 import type { ConversationMessage } from '../types/index';
 
 interface VoiceOverlayProps {
@@ -42,6 +43,7 @@ const thinkingPhrases = [
   'Fetching something for you...',
 ];
 
+
 export const VoiceOverlay: React.FC<VoiceOverlayProps> = ({
   isOpen,
   state,
@@ -79,49 +81,50 @@ export const VoiceOverlay: React.FC<VoiceOverlayProps> = ({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.3 }}
-          className="fixed inset-0 bg-[#1a1921] z-50 flex flex-col overflow-hidden font-sans"
+          transition={{ duration: 0.4 }}
+          className="fixed inset-0 z-50 flex flex-col overflow-hidden"
+          style={{
+            background: 'linear-gradient(160deg, #0d0620 0%, #120b2e 25%, #0a0e2a 55%, #050a1a 100%)',
+            fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+          }}
         >
-          {/* Spotlight Effect for Thinking State */}
-          <AnimatePresence>
-            {state === 'thinking' && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.5 }}
-                className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[800px] h-[70vh] pointer-events-none z-0"
-                style={{
-                  background: 'conic-gradient(from 180deg at 50% 100%, transparent 0deg, rgba(0,170,255,0.4) 30deg, rgba(0,85,255,0.6) 90deg, rgba(0,170,255,0.4) 150deg, transparent 180deg)',
-                  maskImage: 'linear-gradient(to top, black 0%, transparent 100%)',
-                  WebkitMaskImage: 'linear-gradient(to top, black 0%, transparent 100%)',
-                }}
-              />
-            )}
-          </AnimatePresence>
+          {/* Dynamic Ambient Wave — always on so idle aurora animates too */}
+          <AmbientWave
+            data={_waveformData}
+            isActive={true}
+            state={state}
+          />
 
-          {/* Curved Bottom Glow Background */}
-          <div className="absolute bottom-0 left-0 right-0 h-[45%] pointer-events-none overflow-hidden z-0">
-            {/* The bright aurora glow spanning the width */}
-            <div className="absolute bottom-16 left-0 right-0 h-48 bg-gradient-to-r from-[#00bfff] via-[#0055ff] to-[#a50b5e] blur-[70px] opacity-60" />
-            
-            {/* The dark curved base sitting at the bottom */}
-            <div className="absolute -bottom-[50%] left-1/2 -translate-x-1/2 w-[150%] h-[80%] rounded-[50%] bg-[#0c0a10] border-t border-white/10 shadow-[0_-20px_40px_rgba(0,0,0,0.5)]" />
-          </div>
+          {/* Subtle bottom fade-out so content doesn't clash with orb */}
+          <div
+            className="absolute bottom-0 left-0 right-0 pointer-events-none z-[1]"
+            style={{ height: '200px', background: 'linear-gradient(to top, rgba(13,6,32,0.95) 0%, transparent 100%)' }}
+          />
 
-          {/* Top Link */}
+          {/* Premium Top Bar */}
           <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="absolute top-12 left-0 right-0 text-center z-20"
+            transition={{ duration: 0.5 }}
+            className="absolute top-0 left-0 right-0 z-20 px-5 pt-safe"
+            style={{ paddingTop: 'max(env(safe-area-inset-top), 16px)' }}
           >
-            <a
-              href="#"
-              className="text-[13px] font-medium text-white/90 hover:text-white transition-colors relative inline-block tracking-wide"
-            >
-              Click here to go to ChatGPT ↗
-              <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 w-[250%] h-[1px] bg-gradient-to-r from-transparent via-white/20 to-transparent" />
-            </a>
+            <div className="flex items-center justify-between pt-4">
+              {/* Logo / brand mark */}
+              <div className="flex items-center gap-2">
+                <div className="w-7 h-7 rounded-full bg-gradient-to-br from-cyan-400 to-blue-600 flex items-center justify-center">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="white"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg>
+                </div>
+                <span className="text-[13px] font-semibold text-white/80 tracking-widest uppercase">AI Assistant</span>
+              </div>
+              {/* ChatGPT link */}
+              <a
+                href="#"
+                className="flex items-center gap-1.5 text-[12px] font-medium text-white/50 hover:text-white/80 transition-colors tracking-wide"
+              >
+                ChatGPT <span className="text-[10px]">↗</span>
+              </a>
+            </div>
           </motion.div>
 
           {/* Main Content Area - Idle State */}
@@ -129,27 +132,82 @@ export const VoiceOverlay: React.FC<VoiceOverlayProps> = ({
             {state === 'idle' && (
               <motion.div
                 key="idle-content"
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                transition={{ duration: 0.3 }}
-                className="absolute top-[40%] -translate-y-1/2 left-0 w-full pl-6 z-20"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.5, ease: 'easeOut' }}
+                className="absolute inset-0 flex flex-col items-center justify-center z-20 px-6 pb-40"
               >
-                <h2 className="text-[26px] font-medium text-white mb-2 leading-tight tracking-tight">
-                  What are you in the mood for?
-                </h2>
-                <p className="text-[15px] text-gray-400 mb-6">
-                  Tap a suggestion, use your mic, or type to explore.
-                </p>
-                
-                {/* Horizontal Suggestion Chips */}
-                <div className="w-full">
+                {/* Ambient glow behind text */}
+                <div
+                  className="absolute pointer-events-none"
+                  style={{
+                    width: '360px',
+                    height: '200px',
+                    background: 'radial-gradient(ellipse at center, rgba(56,189,248,0.12) 0%, rgba(99,102,241,0.08) 50%, transparent 80%)',
+                    filter: 'blur(24px)',
+                    transform: 'translateY(-20px)',
+                  }}
+                />
+
+                {/* AI icon badge */}
+                <motion.div
+                  initial={{ scale: 0.8, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ delay: 0.1, duration: 0.4, type: 'spring' }}
+                  className="mb-6 flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/5 backdrop-blur-xl border border-white/10"
+                >
+                  <div className="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_6px_rgba(52,211,153,0.8)]" />
+                  <span className="text-[12px] font-semibold text-white/60 tracking-widest uppercase">Ready to listen</span>
+                </motion.div>
+
+                {/* Headline */}
+                <motion.h2
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.15, duration: 0.5 }}
+                  className="text-[32px] font-bold text-center leading-tight tracking-tight mb-3"
+                  style={{
+                    background: 'linear-gradient(135deg, #ffffff 0%, rgba(255,255,255,0.85) 50%, rgba(148,163,220,0.7) 100%)',
+                    WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent',
+                    backgroundClip: 'text',
+                  }}
+                >
+                  What are you in the{' '}
+                  <span
+                    style={{
+                      background: 'linear-gradient(90deg, #38bdf8 0%, #818cf8 100%)',
+                      WebkitBackgroundClip: 'text',
+                      WebkitTextFillColor: 'transparent',
+                      backgroundClip: 'text',
+                    }}
+                  >mood for?</span>
+                </motion.h2>
+
+                {/* Sub-headline */}
+                <motion.p
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.25, duration: 0.5 }}
+                  className="text-[15px] text-white/40 font-medium tracking-wide text-center mb-10"
+                >
+                  Tap the mic or choose a suggestion below
+                </motion.p>
+
+                {/* Suggestion Chips — centered wrap */}
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.35, duration: 0.5 }}
+                  className="w-full flex justify-center"
+                >
                   <SuggestionChips
                     chips={suggestedChips}
                     isVisible={true}
                     onChipClick={(_, text) => onSuggestionClick?.(text)}
                   />
-                </div>
+                </motion.div>
               </motion.div>
             )}
 
@@ -163,17 +221,17 @@ export const VoiceOverlay: React.FC<VoiceOverlayProps> = ({
                 transition={{ duration: 0.3 }}
                 className="absolute top-[38%] -translate-y-1/2 left-0 w-full pl-6 pr-6 z-20"
               >
-                <p className="text-[22px] font-medium text-white leading-snug mb-6">
+                <p className="text-[22px] font-semibold text-transparent bg-clip-text bg-gradient-to-br from-white via-white/90 to-white/60 leading-snug tracking-tight mb-6">
                   Sorry, I couldn't detect your voice clearly.<br />
-                  Please try again by tapping the mic icon or typing in your query.
+                  <span className="text-[16px] text-gray-400 font-medium tracking-normal mt-2 block">Please try again by tapping the mic icon or typing in your query.</span>
                 </p>
                 <motion.button
-                  whileHover={{ scale: 1.02 }}
+                  whileHover={{ scale: 1.02, backgroundColor: 'rgba(255,255,255,0.15)' }}
                   whileTap={{ scale: 0.97 }}
                   onClick={onKeyboardToggle}
-                  className="flex items-center gap-2 px-5 py-3 bg-white/10 border border-white/20 rounded-xl text-white text-[15px] font-medium backdrop-blur-sm"
+                  className="flex items-center gap-2 px-6 py-3.5 bg-white/5 backdrop-blur-xl border border-white/10 shadow-[0_8px_24px_rgba(0,0,0,0.2)] rounded-2xl text-white/95 text-[15px] font-semibold transition-colors"
                 >
-                  Continue to ChatGPT <span className="text-base">↗</span>
+                  Continue to ChatGPT <span className="text-base ml-1">↗</span>
                 </motion.button>
               </motion.div>
             )}
@@ -193,13 +251,17 @@ export const VoiceOverlay: React.FC<VoiceOverlayProps> = ({
                   {messages[messages.length - 1]?.text}
                 </h2>
 
-                {/* Movie Cards Grid */}
-                <div className="grid grid-cols-2 gap-3 mb-6">
+                {/* Movie Cards Horizontal Carousel */}
+                <div className="flex gap-4 mb-6 overflow-x-auto pb-4 pt-2 -mx-5 px-5 scrollbar-hide snap-x" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
                   {[
                     { title: 'Sarabhai vs Sarabhai', bg: 'from-yellow-800 to-yellow-600' },
                     { title: 'Brooklyn Nine-Nine', bg: 'from-slate-700 to-slate-500' },
+                    { title: 'Panchayat', bg: 'from-green-800 to-emerald-600' },
                   ].map((card) => (
-                    <div key={card.title} className={`rounded-xl overflow-hidden bg-gradient-to-b ${card.bg} aspect-[3/4] flex items-end p-2`}>
+                    <div 
+                      key={card.title} 
+                      className={`min-w-[140px] w-[140px] rounded-xl overflow-hidden bg-gradient-to-b ${card.bg} aspect-[3/4] flex items-end p-2 snap-start shadow-lg shadow-black/20 shrink-0`}
+                    >
                       <span className="text-white text-xs font-semibold leading-tight drop-shadow">{card.title}</span>
                     </div>
                   ))}
@@ -302,7 +364,7 @@ export const VoiceOverlay: React.FC<VoiceOverlayProps> = ({
 
               {/* Orb Button */}
               <OrbButton
-                state={state === 'no_voice' ? 'idle' : state}
+                state={(state === 'no_voice' || state === 'speaking') ? 'idle' : state}
                 onClick={onOrbClick}
                 className="w-[72px] h-[72px]"
               />

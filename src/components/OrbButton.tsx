@@ -204,11 +204,18 @@ export const OrbButton: React.FC<OrbButtonProps> = ({ state, onClick, disabled, 
         key={`bg-${state === 'idle' ? idleIconState : state}`}
         className="absolute inset-[-2px] w-[calc(100%+4px)] h-[calc(100%+4px)] rounded-full"
         style={{
-          background: 'radial-gradient(circle at top left, #085DBC 0%, #1B3F7A 30%, #371C4E 55%, #910341 100%)',
+          background:
+            state === 'listening'
+              ? 'radial-gradient(circle at 40% 35%, #00e5ff 0%, #0055ff 45%, #6600ff 100%)'
+              : state === 'thinking'
+              ? 'radial-gradient(circle at 40% 35%, #c084fc 0%, #7c3aed 45%, #4f46e5 100%)'
+              : state === 'speaking'
+              ? 'radial-gradient(circle at 40% 35%, #38bdf8 0%, #4f46e5 45%, #7c3aed 100%)'
+              : 'radial-gradient(circle at 40% 35%, #818cf8 0%, #6d28d9 40%, #4c1d95 75%, #2e1065 100%)',
         }}
         initial={{ scale: 1.08, opacity: 0.85 }}
         animate={{ scale: 1, opacity: 1 }}
-        transition={{ type: "spring", stiffness: 180, damping: 14 }}
+        transition={{ type: 'spring', stiffness: 180, damping: 14 }}
       />
 
       {/* Premium background glow layer - only on hover/active, not idle */}

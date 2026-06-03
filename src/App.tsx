@@ -217,11 +217,8 @@ function App() {
     };
 
     setMessages((prev) => [...prev, assistantMessage]);
-
-    // Simulate end of speaking
-    setTimeout(() => {
-      setConversationState('idle');
-    }, 3000);
+    
+    // The response will stay on screen until the user taps again or interacts.
   }, []);
 
   // Handle home screen orb click

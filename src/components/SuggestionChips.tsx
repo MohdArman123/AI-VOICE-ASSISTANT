@@ -26,6 +26,7 @@ export const SuggestionChips: React.FC<SuggestionChipsProps> = ({
         delayChildren: 0.2,
       },
     },
+    exit: { opacity: 0, transition: { duration: 0.2 } }
   };
 
   const chipVariants = {
@@ -43,22 +44,21 @@ export const SuggestionChips: React.FC<SuggestionChipsProps> = ({
 
   return (
     <motion.div
-      className="w-full px-6 py-8"
+      className="w-full"
       variants={containerVariants}
       initial="hidden"
       animate="visible"
       exit="exit"
     >
-      <p className="text-gray-400 text-sm mb-4 text-center">Tap a suggestion or speak:</p>
-      <div className="grid grid-cols-2 gap-3 justify-items-center">
+      <div className="flex flex-wrap gap-3 justify-center">
         {chips.map((chip) => (
           <motion.button
             key={chip.id}
             variants={chipVariants}
-            whileHover={{ scale: 1.05 }}
+            whileHover={{ scale: 1.05, backgroundColor: 'rgba(255,255,255,0.15)', borderColor: 'rgba(255,255,255,0.3)' }}
             whileTap={{ scale: 0.95 }}
             onClick={() => onChipClick?.(chip.id, chip.text)}
-            className="px-4 py-3 rounded-full bg-slate-800 hover:bg-slate-700 text-white text-sm font-medium transition-colors border border-slate-700 hover:border-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-0"
+            className="px-5 py-2.5 rounded-full bg-white/5 backdrop-blur-xl border border-white/10 text-white/95 text-[14px] font-medium transition-colors shadow-[0_4px_12px_rgba(0,0,0,0.1)]"
           >
             {chip.text}
           </motion.button>
